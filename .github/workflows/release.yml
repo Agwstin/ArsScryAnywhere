@@ -1,0 +1,48 @@
+name: Release
+
+# Publish a GitHub release (tag e.g. v1.0.0) -> builds the jar and uploads it
+# to the GitHub release, Modrinth and CurseForge.
+# Setup (repo Settings -> Secrets and variables -> Actions):
+#   variables: MODRINTH_ID, CURSEFORGE_ID   (project IDs, once the projects exist)
+#   secrets:   MODRINTH_TOKEN, CURSEFORGE_TOKEN
+# A platform is skipped while its ID/token is not set.
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@v6
+
+      - name: Build
+        run: ./gradlew build
+
+      - name: Publish
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          modrinth-id: ${{ vars.MODRINTH_ID }}
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          curseforge-id: ${{ vars.CURSEFORGE_ID }}
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          files: build/libs/!(*-@(dev|sources|javadoc)).jar
+          name: Ars Scry Anywhere ${{ github.event.release.tag_name }}
+          version-type: release
+          loaders: neoforge
+          game-versions: 1.21.1
+          java: 21
+          dependencies: |
+            ars-nouveau(required)

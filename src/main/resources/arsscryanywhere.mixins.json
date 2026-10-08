@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "io.github.agwstin.arsscryanywhere.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": ["ScryCasterDataMixin"],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}
